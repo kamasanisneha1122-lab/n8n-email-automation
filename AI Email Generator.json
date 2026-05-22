@@ -1,0 +1,236 @@
+{
+  "name": "AI Email Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e453c175-67d8-41e3-8d4e-272d1a1e20c6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a162dce0-42a6-4a22-a1d7-c2712c15f37a",
+      "name": "Get many messages",
+      "webhookId": "e1888b29-90f1-4de4-99c7-603158b42e94",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "37VEjfIh9NB0Ku11",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1q5aS-AgElWaoaVeBNAwL1RMj6niwmzMDfHtDljlDGno",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1q5aS-AgElWaoaVeBNAwL1RMj6niwmzMDfHtDljlDGno/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1q5aS-AgElWaoaVeBNAwL1RMj6niwmzMDfHtDljlDGno/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "From": "From",
+            "Subject": "Subject",
+            "Message": "snippet",
+            "Date": "Date (from Gmail node)"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "From",
+              "displayName": "From",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        816,
+        -16
+      ],
+      "id": "0b8b6c93-fa0e-4fd1-b6e2-be634e385501",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hBE2elXDaJNl714E",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "82bcf82f-5406-4070-b15a-7a5155a93476",
+              "leftValue": "Subject: Security alert",
+              "rightValue": "Security",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        0
+      ],
+      "id": "028ffb4b-92dd-40fd-90b6-1ed9e29661aa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "6627454394",
+        "text": "=Security Email Received 🚨 From: {{$json[\"From\"]}} Subject: {{$json[\"Subject\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        -16
+      ],
+      "id": "5004d868-0924-46c6-bf0d-13a1b6646ac1",
+      "name": "Send a text message",
+      "webhookId": "d28dc2d2-f1ba-4f9e-9a30-7c58a2bb604f",
+      "credentials": {
+        "telegramApi": {
+          "id": "cbhWpfwMxpeAtK14",
+          "name": "Telegram account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6f6fd8ea-83b5-4f5f-88b0-f86102ab8491",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb259af4a9bf83738ab3c0d00d561f861368ca5007c1c914ba7768c2516d55e1"
+  },
+  "id": "3hkm7lit1wZsAKYn",
+  "tags": []
+}
